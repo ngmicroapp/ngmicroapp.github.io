@@ -7,25 +7,207 @@
     <title>mat-stepper-bar is not in the npm registry</title>
 </head>
 <body>
-    <div class="cont_principal">
-        <div class="cont_error">
-            <h2>
-                Mat stepper bar is a JavaScript package in the npm registry that has been compromised :(
-            </h2>
-            <h2>
-                Our team is working on it.
-            </h2>
-            <p>
-                If you have any questions, please email us at ngmicroapp@gmail.com
-            </p>
-        </div>
-        <div class="cont_aura_1"></div>
-        <div class="cont_aura_2"></div>
-    </div>
-    <script>
-        window.onload = function(){
-            document.querySelector('.cont_principal').className= "cont_principal cont_error_active";
-        }
-    </script>
+     <h1>mat-stepper-bar Documentation</h1>
+
+    <h2>Overview</h2>
+    <p><code>mat-stepper-bar</code> is an Angular component library designed to implement a multi-step navigation interface (stepper) for forms or processes. This stepper component provides an easy-to-use, customizable solution for creating wizards or complex forms that require user input across multiple steps.</p>
+
+    <h2>Features</h2>
+    <ul>
+        <li><strong>Multi-step navigation</strong>: Allows users to navigate through steps with "Next" and "Back" buttons.</li>
+        <li><strong>Customizable Progress Bar</strong>: Displays the current step and overall progress of the process.</li>
+        <li><strong>Modular Design</strong>: Easily integrates into any Angular application.</li>
+        <li><strong>Support for dynamic content</strong>: Load different content or sections dynamically for each step.</li>
+        <li><strong>Event handling</strong>: Supports navigation control and custom actions for each step.</li>
+        <li><strong>Customizable Controller Buttons</strong>: Includes custom buttons for each step, allowing for actions like saving, submitting, or moving to the next step.</li>
+    </ul>
+
+    <h2>Installation</h2>
+    <p>To install <code>mat-stepper-bar</code> in your Angular project, use npm:</p>
+    <pre><code>npm install mat-stepper-bar --save</code></pre>
+
+    <h3>Usage</h3>
+    <h4>Basic Setup</h4>
+    <h5>1. Import the Module</h5>
+    <p>Import the MatStepperModule in your Angular application module:</p>
+    <pre><code>import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatStepperModule } from 'mat-stepper-bar'; // Import the stepper module
+
+@NgModule({
+  imports: [
+    CommonModule,
+    MatStepperModule, // Register the module
+  ],
+  exports: [MatStepperModule],
+})
+export class AppModule {}</code></pre>
+
+    <h5>2. Add the Stepper to Your Component</h5>
+    <p>Add the mat-stepper component to your HTML. Each step of the process should be wrapped in <code>*stepperSection</code>, and you can define a custom template for the stepper's progress bar and controller:</p>
+
+    <pre><code>&lt;!-- Main stepper component --&gt;
+&lt;mat-stepper *ngIf="startStepper"&gt;
+  &lt;h1 stepper-heading&gt;Step-by-Step Process&lt;/h1&gt;
+
+  &lt;!-- Step 1: Sample Form Section --&gt;
+  &lt;app-sample-form [onSaveClicked]="currentStep === 1" (formData)="handleFormData($event)" *stepperSection&gt;
+    &lt;div class="space-after"&gt;
+      &lt;small&gt;&lt;span class="text-red"&gt;*&lt;/span&gt; Required field&lt;/small&gt;
+    &lt;/div&gt;
+  &lt;/app-sample-form&gt;
+
+  &lt;!-- Step 2: Sample Data Section --&gt;
+  &lt;app-sample-data [onSaveClicked]="currentStep === 2" (dataFormData)="handleDataForm($event)" *stepperSection&gt;
+    &lt;div class="space-after"&gt;
+      &lt;small&gt;&lt;span class="text-red"&gt;*&lt;/span&gt; Required field&lt;/small&gt;
+    &lt;/div&gt;
+  &lt;/app-sample-data&gt;
+
+  &lt;!-- Additional steps here... --&gt;
+
+  &lt;!-- Progress Bar Template --&gt;
+  &lt;ng-template #progressbar let-current&gt;
+    &lt;div class="col-md-6 col-left"&gt;
+      &lt;span class="pull-left"&gt;
+        &lt;p&gt;&lt;b&gt;{{ ( [current, 'sectionName'] | getSectionData ) }}&lt;/b&gt; &nbsp; &lt;small&gt;{{ ( [current, 'percentage'] | getSectionData ) }}&lt;/small&gt;&lt;/p&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="col-md-6 col-right"&gt;
+      &lt;span *ngIf="current === 4" class="pull-right"&gt;
+        &lt;button class="btn btn-bg"&gt;Add Locations&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/ng-template&gt;
+
+  &lt;!-- Stepper Controller Template --&gt;
+  &lt;ng-template #controller let-selected let-ctrl="controller"&gt;
+    &lt;button id="cancel-action" class="btn btn-outline"&gt;Cancel&lt;/button&gt;
+    &lt;button (click)="ctrl.prev()" class="btn btn-outline"&gt;Back&lt;/button&gt;
+    &lt;button *ngIf="!(selected === 8 || selected === 9)" (click)="saveAndContinue(ctrl, selected)" class="btn btn-bg"&gt;Save & Continue&lt;/button&gt;
+    &lt;button id="complete-button" *ngIf="selected === 8 || selected === 9" (click)="submit()" class="btn btn-bg"&gt;Complete&lt;/button&gt;
+  &lt;/ng-template&gt;
+&lt;/mat-stepper&gt;</code></pre>
+
+    <h5>TypeScript Integration</h5>
+    <p>Using MatStepperComponent:</p>
+    <p>In your component's TypeScript file, handle the necessary logic for form data, navigation control, and integration of the MatStepperComponent:</p>
+
+    <pre><code>import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { MatStepperComponent } from 'mat-stepper-bar'; // Import the mat-stepper component
+
+@Component({
+  selector: 'app-stepper-process',
+  templateUrl: './stepper-process.component.html',
+  styleUrls: ['./stepper-process.component.css'],
+})
+export class StepperProcessComponent {
+  sel = 4; // Current selection step index
+  currentStep: number; // Stores the active section index
+  @ViewChild(MatStepperComponent) stepperComponent: MatStepperComponent; // Reference to the stepper component
+  @Output() cancelProcess: EventEmitter&lt;string&gt; = new EventEmitter(); // Event emitter for canceling the process
+  isFormValid: boolean = false; // Flag to track if the form is valid
+  startStepper: boolean = false; // Flag to start the stepper process
+
+  // Form data models
+  sampleFormData: any;
+  sampleDataForm: any;
+
+  constructor() {}
+
+  // Method to start the stepper process
+  startStepperProcess(event): void {
+    if (event) {
+      this.startStepper = true;
+    }
+  }
+
+  // Method to cancel the stepper process
+  cancelStepperProcess(event): void {
+    if (event === 'process-cancelled') {
+      // Handle cancellation logic here
+    }
+  }
+
+  // Submit form data
+  submit(): void {
+    console.log('submit clicked');
+  }
+
+  // Handle the Save & Continue action
+  saveAndContinue(ctrl, selected): any {
+    if (selected === 1) {
+      ctrl.next();
+      return;
+    }
+    this.currentStep = selected;
+
+    if (!this.isFormValid) {
+      return;
+    }
+
+    // Submit form data for different steps
+    if (selected === 1) {
+      // Logic to handle form submission for Step 1
+      console.log('Form data submitted for Step 1');
+      ctrl.next(); // Move to the next step
+    }
+
+    if (selected === 2) {
+      // Logic to handle form submission for Step 2
+      console.log('Form data submitted for Step 2');
+    }
+  }
+
+  // Handle form data from sample form section
+  handleFormData(event): void {
+    if (event) {
+      this.sampleFormData = event;
+      this.isFormValid = true;
+    }
+  }
+
+  // Handle data form submission
+  handleDataForm(event): void {
+    if (event) {
+      this.sampleDataForm = event;
+      this.isFormValid = true;
+    }
+  }
+}</code></pre>
+
+    <h2>Key Features</h2>
+    <h3>Stepper Navigation:</h3>
+    <p>Users can navigate through multiple sections by clicking "Next" or "Back" buttons. The active section and the progress bar are updated accordingly.</p>
+
+    <h3>Custom Templates:</h3>
+    <p>Customize the appearance and behavior of the progress bar and controller using Angular templates (<code>ng-template</code>).</p>
+
+    <h3>Dynamic Content:</h3>
+    <p>Each section can contain custom Angular components or HTML content, making it easy to implement complex forms.</p>
+
+    <h2>Methods & Events</h2>
+    <ul>
+        <li><strong>startStepperProcess(event)</strong>: Starts the stepper process when the event is triggered (e.g., when the user clicks a "Start" button).</li>
+        <li><strong>cancelStepperProcess(event)</strong>: Handles the cancellation of the stepper process.</li>
+        <li><strong>saveAndContinue(ctrl, selected)</strong>: Validates the current section's data and moves to the next step.</li>
+        <li><strong>submit()</strong>: Submits the final data after completing the steps.</li>
+        <li><strong>handleFormData(event)</strong>: Collects data from the sample form section.</li>
+        <li><strong>handleDataForm(event)</strong>: Collects data from the sample data section.</li>
+    </ul>
+
+    <h2>Advanced Configuration</h2>
+    <p>You can customize the behavior and style of the stepper by modifying the CSS and using additional input properties such as <code>moveTo</code>, <code>canNavigate</code>, and more. Please refer to the source code and Angular documentation for further customization options.</p>
+
+    <h2>Conclusion</h2>
+    <p>The mat-stepper-bar component provides an easy-to-integrate, customizable solution for managing multi-step processes in Angular applications. Whether it's for onboarding, account creation, or complex forms, this stepper component is a flexible and reliable tool to enhance the user experience.</p>
+
+    <p>For further documentation, examples, or to contribute, feel free to explore the repository and raise any issues or pull requests.</p>
+
+    <h2>License</h2>
+    <p>For the license details, please email us at <a href="mailto:ngmicroapp@gmail.com">ngmicroapp@gmail.com</a></p>
+    <p>Note this component is free for 3 months.</p>
+
+</body>
 </body>
 </html>
